@@ -324,7 +324,10 @@ def extract_pdf_pages(
             start=1,
         ):
 
-            page_dict = page.get_text("dict")
+            page_dict = page.get_text(
+                "dict",
+                flags=fitz.TEXTFLAGS_DICT | getattr(fitz, "TEXT_DEHYPHENATE", 0),
+            )
 
             page_width = float(
                 page.rect.width
