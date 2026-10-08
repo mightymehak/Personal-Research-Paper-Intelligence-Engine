@@ -10,4 +10,6 @@ class PaperChunk(BaseModel):
 
     chunk_index: int
     text: str
+
     word_count: int
+    token_count: int

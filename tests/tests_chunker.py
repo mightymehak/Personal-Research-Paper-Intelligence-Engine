@@ -6,11 +6,12 @@ from backend.app.services.pdf_parser import parse_pdf
 
 PDF_DIRECTORY = Path("data/raw")
 
-MAX_CHUNK_SIZE = 500
+# The chunker targets approximately 200 tokens.
+# We validate against the same hard target.
+MAX_CHUNK_TOKENS = 200
 
 
 def main():
-
     if not PDF_DIRECTORY.exists():
         print("data/raw directory does not exist.")
         return
@@ -24,6 +25,8 @@ def main():
     if not libraries:
         print("No research paper libraries found.")
         return
+
+    overall_success = True
 
     for library_directory in libraries:
 
@@ -49,6 +52,7 @@ def main():
             print("-" * 80)
 
             try:
+
                 # -------------------------------------------------
                 # Parse PDF
                 # -------------------------------------------------
@@ -66,6 +70,7 @@ def main():
 
                 if not chunks:
                     print("No chunks generated.")
+                    overall_success = False
                     continue
 
                 # -------------------------------------------------
@@ -77,56 +82,98 @@ def main():
                     for chunk in chunks
                 ]
 
+                print("\nWord statistics:")
+
                 print(
-                    f"Minimum chunk size: "
-                    f"{min(word_counts)} words"
+                    f"  Minimum words: "
+                    f"{min(word_counts)}"
                 )
 
                 print(
-                    f"Maximum chunk size: "
-                    f"{max(word_counts)} words"
+                    f"  Maximum words: "
+                    f"{max(word_counts)}"
                 )
 
                 print(
-                    f"Average chunk size: "
-                    f"{sum(word_counts) / len(word_counts):.2f} words"
+                    f"  Average words: "
+                    f"{sum(word_counts) / len(word_counts):.2f}"
                 )
 
                 # -------------------------------------------------
-                # Check for oversized chunks
+                # Token-count statistics
                 # -------------------------------------------------
 
-                oversized_chunks = [
+                token_counts = [
+                    chunk.token_count
+                    for chunk in chunks
+                ]
+
+                print("\nToken statistics:")
+
+                print(
+                    f"  Minimum tokens: "
+                    f"{min(token_counts)}"
+                )
+
+                print(
+                    f"  Maximum tokens: "
+                    f"{max(token_counts)}"
+                )
+
+                print(
+                    f"  Average tokens: "
+                    f"{sum(token_counts) / len(token_counts):.2f}"
+                )
+
+                # -------------------------------------------------
+                # Token limit validation
+                # -------------------------------------------------
+
+                oversized_token_chunks = [
                     chunk
                     for chunk in chunks
-                    if chunk.word_count > MAX_CHUNK_SIZE
+                    if chunk.token_count
+                    > MAX_CHUNK_TOKENS
                 ]
 
                 print(
-                    f"Oversized chunks "
-                    f"(>{MAX_CHUNK_SIZE} words): "
-                    f"{len(oversized_chunks)}"
+                    "\nToken limit validation:"
                 )
 
-                if oversized_chunks:
+                print(
+                    f"  Maximum allowed: "
+                    f"{MAX_CHUNK_TOKENS} tokens"
+                )
+
+                print(
+                    f"  Oversized chunks: "
+                    f"{len(oversized_token_chunks)}"
+                )
+
+                if oversized_token_chunks:
 
                     print(
-                        "\nWARNING: Oversized chunks detected:"
+                        "\nWARNING: Oversized token chunks:"
                     )
 
-                    for chunk in oversized_chunks:
+                    for chunk in oversized_token_chunks:
 
                         print(
                             f"  - {chunk.chunk_id}: "
-                            f"{chunk.word_count} words"
+                            f"{chunk.token_count} tokens "
+                            f"({chunk.word_count} words)"
                         )
+
+                    token_limit_pass = False
+                    overall_success = False
 
                 else:
 
                     print(
-                        "All chunks are within the "
-                        f"{MAX_CHUNK_SIZE}-word limit."
+                        "Token limit validation: PASS"
                     )
+
+                    token_limit_pass = True
 
                 # -------------------------------------------------
                 # Section distribution
@@ -138,7 +185,7 @@ def main():
 
                     sections.setdefault(
                         chunk.section,
-                        0
+                        0,
                     )
 
                     sections[chunk.section] += 1
@@ -162,24 +209,35 @@ def main():
                     print("\n" + "." * 70)
 
                     print(
-                        f"Chunk ID: {chunk.chunk_id}"
+                        f"Chunk ID: "
+                        f"{chunk.chunk_id}"
                     )
 
                     print(
-                        f"Section: {chunk.section}"
+                        f"Section: "
+                        f"{chunk.section}"
                     )
 
                     print(
-                        f"Index: {chunk.chunk_index}"
+                        f"Index: "
+                        f"{chunk.chunk_index}"
                     )
 
                     print(
-                        f"Word count: {chunk.word_count}"
+                        f"Word count: "
+                        f"{chunk.word_count}"
+                    )
+
+                    print(
+                        f"Token count: "
+                        f"{chunk.token_count}"
                     )
 
                     print("\nText:")
 
-                    print(chunk.text[:700])
+                    print(
+                        chunk.text[:700]
+                    )
 
                     if len(chunk.text) > 700:
                         print("...")
@@ -195,24 +253,35 @@ def main():
                 print("\n" + "." * 70)
 
                 print(
-                    f"Chunk ID: {last_chunk.chunk_id}"
+                    f"Chunk ID: "
+                    f"{last_chunk.chunk_id}"
                 )
 
                 print(
-                    f"Section: {last_chunk.section}"
+                    f"Section: "
+                    f"{last_chunk.section}"
                 )
 
                 print(
-                    f"Index: {last_chunk.chunk_index}"
+                    f"Index: "
+                    f"{last_chunk.chunk_index}"
                 )
 
                 print(
-                    f"Word count: {last_chunk.word_count}"
+                    f"Word count: "
+                    f"{last_chunk.word_count}"
+                )
+
+                print(
+                    f"Token count: "
+                    f"{last_chunk.token_count}"
                 )
 
                 print("\nText:")
 
-                print(last_chunk.text[:700])
+                print(
+                    last_chunk.text[:700]
+                )
 
                 if len(last_chunk.text) > 700:
                     print("...")
@@ -236,11 +305,16 @@ def main():
                         "\nChunk index validation: PASS"
                     )
 
+                    index_validation = True
+
                 else:
 
                     print(
                         "\nChunk index validation: FAIL"
                     )
+
+                    index_validation = False
+                    overall_success = False
 
                 # -------------------------------------------------
                 # Empty-text validation
@@ -258,11 +332,22 @@ def main():
                         "Empty chunk validation: PASS"
                     )
 
+                    empty_validation = True
+
                 else:
 
                     print(
                         "Empty chunk validation: FAIL"
                     )
+
+                    for chunk in empty_chunks:
+
+                        print(
+                            f"  - {chunk.chunk_id}"
+                        )
+
+                    empty_validation = False
+                    overall_success = False
 
                 # -------------------------------------------------
                 # Word-count validation
@@ -288,28 +373,131 @@ def main():
                         "Word count validation: PASS"
                     )
 
+                    word_count_validation = True
+
                 else:
 
                     print(
                         "Word count validation: FAIL"
                     )
 
-                    for chunk_id in incorrect_word_counts:
+                    for chunk_id in (
+                        incorrect_word_counts
+                    ):
 
                         print(
                             f"  - {chunk_id}"
                         )
 
+                    word_count_validation = False
+                    overall_success = False
+
+                # -------------------------------------------------
+                # Token-count validation
+                # -------------------------------------------------
+
+                incorrect_token_counts = []
+
+                for chunk in chunks:
+
+                    if chunk.token_count <= 0:
+
+                        incorrect_token_counts.append(
+                            chunk.chunk_id
+                        )
+
+                if not incorrect_token_counts:
+
+                    print(
+                        "Token count validation: PASS"
+                    )
+
+                    token_count_validation = True
+
+                else:
+
+                    print(
+                        "Token count validation: FAIL"
+                    )
+
+                    for chunk_id in (
+                        incorrect_token_counts
+                    ):
+
+                        print(
+                            f"  - {chunk_id}"
+                        )
+
+                    token_count_validation = False
+                    overall_success = False
+
+                # -------------------------------------------------
+                # Token limit vs model limit
+                # -------------------------------------------------
+
+                model_max_tokens = 256
+
+                exceeding_model_limit = [
+                    chunk
+                    for chunk in chunks
+                    if chunk.token_count
+                    > model_max_tokens
+                ]
+
+                print(
+                    "\nModel limit validation:"
+                )
+
+                print(
+                    f"  Model maximum: "
+                    f"{model_max_tokens} tokens"
+                )
+
+                print(
+                    f"  Chunks exceeding model limit: "
+                    f"{len(exceeding_model_limit)}"
+                )
+
+                if not exceeding_model_limit:
+
+                    print(
+                        "Model limit validation: PASS"
+                    )
+
+                    model_limit_validation = True
+
+                else:
+
+                    print(
+                        "Model limit validation: FAIL"
+                    )
+
+                    for chunk in (
+                        exceeding_model_limit
+                    ):
+
+                        print(
+                            f"  - {chunk.chunk_id}: "
+                            f"{chunk.token_count} tokens"
+                        )
+
+                    model_limit_validation = False
+                    overall_success = False
+
                 # -------------------------------------------------
                 # Overall paper validation
                 # -------------------------------------------------
 
-                if (
-                    not oversized_chunks
-                    and not empty_chunks
-                    and actual_indices == expected_indices
-                    and not incorrect_word_counts
-                ):
+                paper_success = (
+                    token_limit_pass
+                    and index_validation
+                    and empty_validation
+                    and word_count_validation
+                    and token_count_validation
+                    and model_limit_validation
+                )
+
+                if paper_success:
 
                     print(
                         "\nChunk validation: SUCCESS"
@@ -331,9 +519,36 @@ def main():
                     f"Error: {error}"
                 )
 
+                overall_success = False
+
+    # ---------------------------------------------------------
+    # Final summary
+    # ---------------------------------------------------------
+
     print("\n" + "=" * 80)
     print("CHUNKING TEST COMPLETE")
     print("=" * 80)
+
+    if overall_success:
+
+        print(
+            "\nOVERALL RESULT: SUCCESS"
+        )
+
+        print(
+            "All chunks passed token, word, index, "
+            "empty-text, and model-limit validation."
+        )
+
+    else:
+
+        print(
+            "\nOVERALL RESULT: FAILED"
+        )
+
+        print(
+            "One or more validation checks failed."
+        )
 
 
 if __name__ == "__main__":

@@ -35,9 +35,18 @@ class EmbeddingService:
             self.model.get_sentence_embedding_dimension()
         )
 
+        self.max_seq_length = (
+            self.model.max_seq_length
+        )
+
         print(
             "Embedding dimension: "
             f"{self.embedding_dimension}"
+        )
+
+        print(
+            "Maximum sequence length: "
+            f"{self.max_seq_length} tokens"
         )
 
     def encode_text(
@@ -73,14 +82,45 @@ class EmbeddingService:
 
         Returns:
             numpy array with shape:
-
             (number_of_chunks, embedding_dimension)
         """
 
         if not chunks:
             return np.empty(
-                (0, self.embedding_dimension),
+                (
+                    0,
+                    self.embedding_dimension,
+                ),
                 dtype=np.float32,
+            )
+
+        # --------------------------------------------------
+        # Validate that chunks fit inside model limit.
+        # --------------------------------------------------
+
+        oversized_chunks = [
+            chunk
+            for chunk in chunks
+            if chunk.token_count
+            > self.max_seq_length
+        ]
+
+        if oversized_chunks:
+
+            details = "\n".join(
+                (
+                    f"  - {chunk.chunk_id}: "
+                    f"{chunk.token_count} tokens"
+                )
+                for chunk in oversized_chunks[:10]
+            )
+
+            raise ValueError(
+                "Cannot generate embeddings because "
+                "some chunks exceed the model's "
+                f"maximum sequence length "
+                f"({self.max_seq_length} tokens).\n"
+                f"{details}"
             )
 
         texts = [
@@ -96,6 +136,43 @@ class EmbeddingService:
             show_progress_bar=True,
         )
 
-        return embeddings.astype(
+        embeddings = embeddings.astype(
             np.float32
         )
+
+        # --------------------------------------------------
+        # Validate embedding shape.
+        # --------------------------------------------------
+
+        expected_shape = (
+            len(chunks),
+            self.embedding_dimension,
+        )
+
+        if embeddings.shape != expected_shape:
+
+            raise ValueError(
+                "Unexpected embedding shape. "
+                f"Expected {expected_shape}, "
+                f"got {embeddings.shape}."
+            )
+
+        # --------------------------------------------------
+        # Validate normalization.
+        # --------------------------------------------------
+
+        norms = np.linalg.norm(
+            embeddings,
+            axis=1,
+        )
+
+        if not np.allclose(
+            norms,
+            1.0,
+            atol=1e-5,
+        ):
+            raise ValueError(
+                "Embedding normalization failed."
+            )
+
+        return embeddings
