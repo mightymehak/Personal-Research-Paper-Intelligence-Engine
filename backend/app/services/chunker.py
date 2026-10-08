@@ -3,22 +3,30 @@ from __future__ import annotations
 import re
 from typing import List
 
+from sentence_transformers import SentenceTransformer
+
 from backend.app.models.chunk import PaperChunk
 from backend.app.models.paper import Paper
 
 
-DEFAULT_CHUNK_SIZE = 500
-DEFAULT_CHUNK_OVERLAP = 75
+MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Very small fragments are usually not useful as independent
-# retrieval chunks. They will be merged with neighboring content
-# when possible.
+DEFAULT_CHUNK_TOKENS = 200
+DEFAULT_CHUNK_OVERLAP = 35
+
 MIN_FRAGMENT_SIZE = 50
+
+
+# Load the tokenizer once when this module is imported.
+#
+# We only need the tokenizer here, not the embedding model itself.
+_embedding_model = SentenceTransformer(MODEL_NAME)
+_tokenizer = _embedding_model.tokenizer
 
 
 def normalize_text(text: str) -> str:
     """
-    Normalize whitespace while preserving the actual textual content.
+    Normalize whitespace while preserving the textual content.
     """
 
     text = re.sub(r"\s+", " ", text)
@@ -29,11 +37,6 @@ def normalize_text(text: str) -> str:
 def word_count(text: str) -> int:
     """
     Count whitespace-separated words.
-
-    NOTE:
-    This is intentionally a word count rather than a true tokenizer
-    count. In Phase 2B, this will be replaced by the tokenizer used
-    by the Sentence Transformer embedding model.
     """
 
     if not text:
@@ -42,84 +45,184 @@ def word_count(text: str) -> int:
     return len(text.split())
 
 
-def split_long_paragraph(
-    paragraph: str,
-    chunk_size: int,
+def token_count(text: str) -> int:
+    """
+    Count tokens using the exact tokenizer used by
+    all-MiniLM-L6-v2.
+
+    Special tokens are included because they are part of
+    the actual model input.
+    """
+
+    if not text:
+        return 0
+
+    encoded = _tokenizer(
+        text,
+        add_special_tokens=True,
+        truncation=False,
+        padding=False,
+    )
+
+    return len(encoded["input_ids"])
+
+
+def split_text_by_tokens(
+    text: str,
+    max_tokens: int,
 ) -> List[str]:
     """
-    Split a paragraph that is larger than the maximum chunk size.
+    Split text into pieces that stay within max_tokens.
 
-    Long paragraphs cannot preserve paragraph boundaries, so they are
-    split by words.
-
-    No overlap is introduced here. Overlap is handled at the
-    chunk-to-chunk level by the main chunking function.
+    Splitting is performed at word boundaries rather than
+    arbitrary token boundaries so that chunks remain readable.
     """
 
-    words = paragraph.split()
+    text = normalize_text(text)
 
-    if not words:
+    if not text:
         return []
 
+    if max_tokens <= 0:
+        raise ValueError(
+            "max_tokens must be greater than 0"
+        )
+
+    words = text.split()
+
     chunks = []
+    current_words = []
 
-    for start in range(0, len(words), chunk_size):
-        end = start + chunk_size
+    for word in words:
 
-        chunk = " ".join(words[start:end]).strip()
+        candidate_words = current_words + [word]
+        candidate_text = " ".join(candidate_words)
 
-        if chunk:
-            chunks.append(chunk)
+        candidate_tokens = token_count(candidate_text)
+
+        if (
+            current_words
+            and candidate_tokens > max_tokens
+        ):
+            chunks.append(
+                " ".join(current_words)
+            )
+
+            current_words = [word]
+
+        elif candidate_tokens > max_tokens:
+            # A single unusual word/token sequence can itself
+            # exceed the limit.
+            #
+            # Fall back to tokenizer-level splitting.
+            encoded = _tokenizer(
+                word,
+                add_special_tokens=False,
+                truncation=False,
+                padding=False,
+            )
+
+            word_token_ids = encoded["input_ids"]
+
+            for start in range(
+                0,
+                len(word_token_ids),
+                max_tokens,
+            ):
+                token_slice = word_token_ids[
+                    start:start + max_tokens
+                ]
+
+                decoded = _tokenizer.decode(
+                    token_slice,
+                    skip_special_tokens=True,
+                ).strip()
+
+                if decoded:
+                    chunks.append(decoded)
+
+            current_words = []
+
+        else:
+            current_words = candidate_words
+
+    if current_words:
+        chunks.append(
+            " ".join(current_words)
+        )
 
     return chunks
 
 
-def get_last_words(
+def get_last_tokens(
     text: str,
-    count: int,
+    max_tokens: int,
 ) -> str:
     """
-    Return the last `count` words from a piece of text.
+    Return approximately the last max_tokens from text,
+    while keeping the overlap readable by preferring
+    word boundaries.
     """
 
-    if count <= 0:
+    if not text or max_tokens <= 0:
         return ""
 
     words = text.split()
 
-    if len(words) <= count:
-        return text
+    selected_words = []
 
-    return " ".join(words[-count:])
+    for word in reversed(words):
+
+        candidate_words = [
+            word
+        ] + selected_words
+
+        candidate_text = " ".join(
+            candidate_words
+        )
+
+        if (
+            token_count(candidate_text)
+            <= max_tokens
+        ):
+            selected_words = candidate_words
+        else:
+            break
+
+    return " ".join(selected_words)
 
 
 def split_section_into_chunks(
     section_text: str,
-    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    chunk_size: int = DEFAULT_CHUNK_TOKENS,
     overlap: int = DEFAULT_CHUNK_OVERLAP,
 ) -> List[str]:
     """
-    Split one paper section into retrieval-friendly chunks.
+    Split a section into token-aware retrieval chunks.
 
     Strategy:
 
     1. Normalize the section.
-    2. Split the section into paragraphs.
-    3. Keep paragraphs together whenever possible.
-    4. Split exceptionally large paragraphs.
-    5. Enforce a hard maximum chunk size.
-    6. Add approximately `overlap` words from the previous chunk.
-    7. Avoid unnecessary tiny fragments.
+    2. Split into paragraphs.
+    3. Preserve paragraph boundaries whenever possible.
+    4. Split exceptionally large paragraphs by tokens.
+    5. Build chunks up to chunk_size tokens.
+    6. Add overlap from the previous chunk.
+    7. Guarantee that chunks stay within chunk_size tokens.
     """
 
     if not section_text or not section_text.strip():
         return []
 
     if chunk_size <= 0:
-        raise ValueError("chunk_size must be greater than 0")
+        raise ValueError(
+            "chunk_size must be greater than 0"
+        )
 
     if overlap < 0:
-        raise ValueError("overlap cannot be negative")
+        raise ValueError(
+            "overlap cannot be negative"
+        )
 
     if overlap >= chunk_size:
         raise ValueError(
@@ -139,138 +242,96 @@ def split_section_into_chunks(
 
     for paragraph in raw_paragraphs:
 
-        paragraph = normalize_text(paragraph)
+        paragraph = normalize_text(
+            paragraph
+        )
 
         if paragraph:
-            paragraphs.append(paragraph)
+            paragraphs.append(
+                paragraph
+            )
 
     if not paragraphs:
         return []
 
     # ---------------------------------------------------------
-    # Step 2: Handle exceptionally long paragraphs
+    # Step 2: Split paragraphs that exceed token limit
     # ---------------------------------------------------------
 
     processed_paragraphs = []
 
     for paragraph in paragraphs:
 
-        if word_count(paragraph) <= chunk_size:
-            processed_paragraphs.append(paragraph)
+        if (
+            token_count(paragraph)
+            <= chunk_size
+        ):
+            processed_paragraphs.append(
+                paragraph
+            )
 
         else:
             processed_paragraphs.extend(
-                split_long_paragraph(
+                split_text_by_tokens(
                     paragraph,
                     chunk_size,
                 )
             )
 
     # ---------------------------------------------------------
-    # Step 3: Build chunks from paragraphs
+    # Step 3: Build base chunks without overlap
     # ---------------------------------------------------------
 
-    chunks = []
+    base_chunks = []
 
     current_parts: List[str] = []
-    current_word_count = 0
+    current_tokens = 0
 
     for paragraph in processed_paragraphs:
 
-        paragraph_words = word_count(paragraph)
+        paragraph_tokens = token_count(
+            paragraph
+        )
 
-        # -----------------------------------------------------
-        # If the paragraph itself fits into the current chunk
-        # -----------------------------------------------------
-
+        # Paragraph fits into current chunk.
         if (
             current_parts
-            and current_word_count + paragraph_words <= chunk_size
+            and current_tokens
+            + paragraph_tokens
+            <= chunk_size
         ):
-            current_parts.append(paragraph)
-            current_word_count += paragraph_words
+            current_parts.append(
+                paragraph
+            )
+
+            current_tokens += (
+                paragraph_tokens
+            )
+
             continue
 
-        # -----------------------------------------------------
-        # If adding the paragraph would exceed the limit,
-        # finalize the current chunk first.
-        # -----------------------------------------------------
-
+        # Finalize current chunk.
         if current_parts:
-
-            current_chunk = " ".join(current_parts).strip()
-
-            if current_chunk:
-                chunks.append(current_chunk)
-
-            # -------------------------------------------------
-            # Create overlap from the END of the finalized chunk.
-            #
-            # This is the important fix.
-            #
-            # We take exactly approximately `overlap` words
-            # rather than accidentally including an entire
-            # previous paragraph.
-            # -------------------------------------------------
-
-            overlap_text = get_last_words(
-                current_chunk,
-                overlap,
-            )
-
-            current_parts = []
-
-            if overlap_text:
-                current_parts.append(overlap_text)
-
-            current_word_count = word_count(
-                overlap_text
-            )
-
-        # -----------------------------------------------------
-        # Add the new paragraph.
-        # -----------------------------------------------------
-
-        current_parts.append(paragraph)
-
-        current_word_count += paragraph_words
-
-        # -----------------------------------------------------
-        # Safety check.
-        #
-        # This should normally only happen when the paragraph
-        # was already split above.
-        # -----------------------------------------------------
-
-        if current_word_count > chunk_size:
 
             current_chunk = " ".join(
                 current_parts
             ).strip()
 
-            current_words = current_chunk.split()
+            if current_chunk:
+                base_chunks.append(
+                    current_chunk
+                )
 
-            # Keep the most recent `chunk_size` words.
-            current_chunk = " ".join(
-                current_words[-chunk_size:]
-            )
+        # Start a new chunk.
+        current_parts = [
+            paragraph
+        ]
 
-            chunks.append(current_chunk)
+        current_tokens = (
+            paragraph_tokens
+        )
 
-            overlap_text = get_last_words(
-                current_chunk,
-                overlap,
-            )
-
-            current_parts = [overlap_text]
-            current_word_count = word_count(
-                overlap_text
-            )
-
-    # ---------------------------------------------------------
-    # Step 4: Final chunk
-    # ---------------------------------------------------------
-
+    # Final chunk.
     if current_parts:
 
         final_chunk = " ".join(
@@ -278,88 +339,205 @@ def split_section_into_chunks(
         ).strip()
 
         if final_chunk:
-            chunks.append(final_chunk)
+            base_chunks.append(
+                final_chunk
+            )
 
     # ---------------------------------------------------------
-    # Step 5: Clean up accidental duplicates / empty chunks
-    # ---------------------------------------------------------
-
-    cleaned_chunks = []
-
-    for chunk in chunks:
-
-        chunk = normalize_text(chunk)
-
-        if not chunk:
-            continue
-
-        cleaned_chunks.append(chunk)
-
-    # ---------------------------------------------------------
-    # Step 6: Handle tiny fragments
-    #
-    # We don't delete legitimate short sections. This function
-    # only merges a tiny chunk when it is clearly an accidental
-    # fragment created by splitting.
+    # Step 4: Add token overlap
     # ---------------------------------------------------------
 
     final_chunks = []
 
-    for chunk in cleaned_chunks:
+    for index, base_chunk in enumerate(
+        base_chunks
+    ):
 
-        current_count = word_count(chunk)
+        if index == 0:
 
-        # Keep the first chunk even if it is short.
-        if not final_chunks:
-            final_chunks.append(chunk)
+            final_chunks.append(
+                normalize_text(
+                    base_chunk
+                )
+            )
+
             continue
 
-        # If this is a very small fragment and adding it to the
-        # previous chunk would still respect the hard maximum,
-        # merge it.
-        if (
-            current_count < MIN_FRAGMENT_SIZE
-            and word_count(final_chunks[-1]) + current_count
-            <= chunk_size
-        ):
-            final_chunks[-1] = (
-                final_chunks[-1] + " " + chunk
-            ).strip()
+        previous_chunk = final_chunks[-1]
+
+        overlap_text = get_last_tokens(
+            previous_chunk,
+            overlap,
+        )
+
+        if not overlap_text:
+
+            final_chunks.append(
+                base_chunk
+            )
+
+            continue
+
+        overlap_tokens = token_count(
+            overlap_text
+        )
+
+        available_tokens = (
+            chunk_size
+            - overlap_tokens
+        )
+
+        # The current base chunk should already
+        # be <= chunk_size. We now need to leave
+        # room for the overlap.
+        current_tokens = token_count(
+            base_chunk
+        )
+
+        if current_tokens <= available_tokens:
+
+            combined = (
+                overlap_text
+                + " "
+                + base_chunk
+            )
+
+            final_chunks.append(
+                normalize_text(
+                    combined
+                )
+            )
 
         else:
-            final_chunks.append(chunk)
 
-    return final_chunks
+            # Keep only as much of the current
+            # chunk as fits after the overlap.
+            current_words = base_chunk.split()
+
+            selected_words = []
+
+            for word in current_words:
+
+                candidate_words = (
+                    selected_words
+                    + [word]
+                )
+
+                candidate_text = " ".join(
+                    candidate_words
+                )
+
+                candidate_tokens = (
+                    token_count(
+                        candidate_text
+                    )
+                )
+
+                if (
+                    candidate_tokens
+                    <= available_tokens
+                ):
+                    selected_words.append(
+                        word
+                    )
+                else:
+                    break
+
+            current_part = " ".join(
+                selected_words
+            )
+
+            if current_part:
+
+                combined = (
+                    overlap_text
+                    + " "
+                    + current_part
+                )
+
+                final_chunks.append(
+                    normalize_text(
+                        combined
+                    )
+                )
+
+            else:
+                final_chunks.append(
+                    base_chunk
+                )
+
+    # ---------------------------------------------------------
+    # Step 5: Final validation
+    # ---------------------------------------------------------
+
+    validated_chunks = []
+
+    for chunk in final_chunks:
+
+        chunk = normalize_text(
+            chunk
+        )
+
+        if not chunk:
+            continue
+
+        count = token_count(
+            chunk
+        )
+
+        if count <= chunk_size:
+
+            validated_chunks.append(
+                chunk
+            )
+
+        else:
+
+            # Absolute safety fallback.
+            validated_chunks.extend(
+                split_text_by_tokens(
+                    chunk,
+                    chunk_size,
+                )
+            )
+
+    return validated_chunks
 
 
 def chunk_paper(
     paper: Paper,
-    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    chunk_size: int = DEFAULT_CHUNK_TOKENS,
     overlap: int = DEFAULT_CHUNK_OVERLAP,
 ) -> List[PaperChunk]:
     """
-    Convert a parsed Paper into section-aware PaperChunk objects.
+    Convert a parsed Paper into section-aware,
+    token-aware PaperChunk objects.
 
-    References are intentionally excluded from the retrieval
-    chunks. They will be useful later for citation-graph
-    functionality.
+    References are intentionally excluded from
+    retrieval chunks.
     """
 
     chunks: List[PaperChunk] = []
 
     chunk_index = 0
 
-    for section_name, section_text in paper.sections.items():
+    for section_name, section_text in (
+        paper.sections.items()
+    ):
 
-        section_chunks = split_section_into_chunks(
-            section_text=section_text,
-            chunk_size=chunk_size,
-            overlap=overlap,
+        section_chunks = (
+            split_section_into_chunks(
+                section_text=section_text,
+                chunk_size=chunk_size,
+                overlap=overlap,
+            )
         )
 
         for chunk_text in section_chunks:
 
-            chunk_text = normalize_text(chunk_text)
+            chunk_text = normalize_text(
+                chunk_text
+            )
 
             if not chunk_text:
                 continue
@@ -375,7 +553,12 @@ def chunk_paper(
                     section=section_name,
                     chunk_index=chunk_index,
                     text=chunk_text,
-                    word_count=word_count(chunk_text),
+                    word_count=word_count(
+                        chunk_text
+                    ),
+                    token_count=token_count(
+                        chunk_text
+                    ),
                 )
             )
 
