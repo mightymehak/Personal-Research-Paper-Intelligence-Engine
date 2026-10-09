@@ -5,3 +5,4 @@ python-dotenv
 pymupdf
 pydantic
 sentence-transformers
+faiss-cpu==1.9.0
