@@ -1,3 +1,4 @@
+
 from __future__ import annotations
 
 from typing import List
@@ -12,51 +13,22 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 class EmbeddingService:
-    """
-    Generates semantic embeddings for PaperMind chunks
-    using a Sentence Transformer model.
-    """
-
-    def __init__(
-        self,
-        model_name: str = MODEL_NAME,
-    ):
+    def __init__(self, model_name: str = MODEL_NAME):
         self.model_name = model_name
 
-        print(
-            f"Loading embedding model: {model_name}"
-        )
-
-        self.model = SentenceTransformer(
-            model_name
-        )
+        print(f"Loading embedding model: {model_name}")
+        self.model = SentenceTransformer(model_name)
 
         self.embedding_dimension = (
             self.model.get_sentence_embedding_dimension()
         )
+        self.max_seq_length = self.model.max_seq_length
 
-        self.max_seq_length = (
-            self.model.max_seq_length
-        )
+        print(f"Embedding dimension: {self.embedding_dimension}")
+        print(f"Maximum sequence length: {self.max_seq_length}")
 
-        print(
-            "Embedding dimension: "
-            f"{self.embedding_dimension}"
-        )
-
-        print(
-            "Maximum sequence length: "
-            f"{self.max_seq_length} tokens"
-        )
-
-    def encode_text(
-        self,
-        text: str,
-    ) -> np.ndarray:
-        """
-        Convert a single text into a normalized embedding.
-        """
-
+    def encode_text(self, text: str) -> np.ndarray:
+        """Generate one normalized embedding."""
         if not text or not text.strip():
             raise ValueError(
                 "Cannot generate embedding for empty text."
@@ -68,65 +40,48 @@ class EmbeddingService:
             normalize_embeddings=True,
         )
 
-        return embedding.astype(
-            np.float32
-        )
+        embedding = np.asarray(embedding, dtype=np.float32)
+
+        if embedding.shape != (self.embedding_dimension,):
+            raise ValueError(
+                f"Unexpected embedding shape: {embedding.shape}"
+            )
+
+        if not np.isclose(np.linalg.norm(embedding), 1.0, atol=1e-4):
+            raise ValueError("Embedding is not L2-normalized.")
+
+        return embedding
 
     def encode_chunks(
         self,
         chunks: List[PaperChunk],
         batch_size: int = 32,
     ) -> np.ndarray:
-        """
-        Generate normalized embeddings for multiple chunks.
-
-        Returns:
-            numpy array with shape:
-            (number_of_chunks, embedding_dimension)
-        """
-
+        """Generate normalized embeddings for paper chunks."""
         if not chunks:
             return np.empty(
-                (
-                    0,
-                    self.embedding_dimension,
-                ),
+                (0, self.embedding_dimension),
                 dtype=np.float32,
             )
 
-        # --------------------------------------------------
-        # Validate that chunks fit inside model limit.
-        # --------------------------------------------------
-
-        oversized_chunks = [
-            chunk
+        # Validate chunk lengths before encoding.
+        oversized = [
+            {
+                "chunk_id": chunk.chunk_id,
+                "token_count": chunk.token_count,
+            }
             for chunk in chunks
-            if chunk.token_count
-            > self.max_seq_length
+            if chunk.token_count > self.max_seq_length
         ]
 
-        if oversized_chunks:
-
-            details = "\n".join(
-                (
-                    f"  - {chunk.chunk_id}: "
-                    f"{chunk.token_count} tokens"
-                )
-                for chunk in oversized_chunks[:10]
-            )
-
+        if oversized:
             raise ValueError(
-                "Cannot generate embeddings because "
-                "some chunks exceed the model's "
-                f"maximum sequence length "
-                f"({self.max_seq_length} tokens).\n"
-                f"{details}"
+                f"{len(oversized)} chunks exceed the model's "
+                f"{self.max_seq_length}-token limit. "
+                f"Examples: {oversized[:10]}"
             )
 
-        texts = [
-            chunk.text
-            for chunk in chunks
-        ]
+        texts = [chunk.text for chunk in chunks]
 
         embeddings = self.model.encode(
             texts,
@@ -136,13 +91,7 @@ class EmbeddingService:
             show_progress_bar=True,
         )
 
-        embeddings = embeddings.astype(
-            np.float32
-        )
-
-        # --------------------------------------------------
-        # Validate embedding shape.
-        # --------------------------------------------------
+        embeddings = np.asarray(embeddings, dtype=np.float32)
 
         expected_shape = (
             len(chunks),
@@ -150,29 +99,26 @@ class EmbeddingService:
         )
 
         if embeddings.shape != expected_shape:
-
             raise ValueError(
-                "Unexpected embedding shape. "
-                f"Expected {expected_shape}, "
-                f"got {embeddings.shape}."
+                f"Expected embedding shape {expected_shape}, "
+                f"got {embeddings.shape}"
             )
 
-        # --------------------------------------------------
-        # Validate normalization.
-        # --------------------------------------------------
+        if not np.isfinite(embeddings).all():
+            raise ValueError(
+                "Embeddings contain NaN or infinite values."
+            )
 
-        norms = np.linalg.norm(
-            embeddings,
-            axis=1,
+        norms = np.linalg.norm(embeddings, axis=1)
+
+        if not np.allclose(norms, 1.0, atol=1e-4):
+            raise ValueError(
+                "Some embeddings are not L2-normalized."
+            )
+
+        print(
+            f"Successfully embedded {len(chunks)} chunks "
+            f"into {self.embedding_dimension}-dimensional vectors."
         )
-
-        if not np.allclose(
-            norms,
-            1.0,
-            atol=1e-5,
-        ):
-            raise ValueError(
-                "Embedding normalization failed."
-            )
 
         return embeddings
