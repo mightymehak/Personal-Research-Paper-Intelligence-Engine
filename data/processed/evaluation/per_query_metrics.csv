@@ -1,0 +1,18 @@
+query_id,query,precision@5,recall@5,precision@10,recall@10,mrr,ndcg@10
+Q01,What are the advantages of decoupling vector indexes in PostgreSQL?,0.4,0.6666666666666666,0.3,1.0,1.0,0.9010126104210695
+Q02,How do vector databases perform similarity search?,0.2,0.3333333333333333,0.3,1.0,0.25,0.48580027541592796
+Q03,How do approximate nearest neighbor indexes work?,1.0,0.625,0.8,1.0,1.0,1.0
+Q04,What is the difference between exact nearest neighbor search and approximate nearest neighbor search?,1.0,0.7142857142857143,0.7,1.0,1.0,0.9950883841893561
+Q05,How do graph-based indexes accelerate vector search?,0.2,0.25,0.4,1.0,1.0,0.777079017590005
+Q06,What are the main challenges of maintaining consistency between a database and a decoupled vector index?,1.0,0.7142857142857143,0.7,1.0,1.0,0.9815441540827996
+Q07,How can vector search performance be improved in PostgreSQL?,0.6,0.6,0.5,1.0,1.0,0.8993515008051188
+Q08,What role do embeddings play in vector database search?,0.4,0.5,0.4,1.0,1.0,0.8421423592553552
+Q09,How do vector databases organize and store high-dimensional vectors?,0.2,0.3333333333333333,0.3,1.0,0.25,0.49141527484330916
+Q10,Which techniques are used to reduce the cost of vector similarity search?,0.2,0.5,0.2,1.0,0.2,0.45560514958746035
+Q11,How does PostgreSQL support vector indexing and similarity queries?,0.8,0.5714285714285714,0.7,1.0,0.5,0.796670591535181
+Q12,What are the limitations of existing vector database management systems?,0.8,0.5714285714285714,0.7,1.0,1.0,0.9561626706667608
+Q13,How does a vector database select the top-k nearest vectors?,0.6,1.0,0.3,1.0,1.0,0.9674679834891693
+Q15,What experiments are used to evaluate vector search systems?,0.2,1.0,0.1,1.0,0.3333333333333333,0.5
+Q18,What are the key contributions of the decoupled vector search approach for PostgreSQL?,0.6,0.75,0.4,1.0,1.0,0.9279611693743142
+Q19,What are the main research directions and unresolved challenges in vector databases?,0.2,1.0,0.1,1.0,1.0,1.0
+Q20,How do vector database systems differ in their indexing and search approaches?,0.8,0.5,0.8,1.0,1.0,0.9560094522876519
