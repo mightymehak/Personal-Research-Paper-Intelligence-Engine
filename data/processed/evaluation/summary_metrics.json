@@ -1,16 +1,23 @@
 {
-  "evaluated_queries": 17,
+  "candidate_k": 50,
+  "evaluation_cutoffs": [
+    5,
+    10
+  ],
+  "evaluated_queries": 19,
   "skipped_queries": [
-    "Q14",
-    "Q16",
-    "Q17"
+    {
+      "query_id": "Q17",
+      "reason": "No relevant chunk IDs labeled."
+    }
   ],
   "metrics": {
-    "precision@5": 0.5411764705882354,
-    "recall@5": 0.6252801120448178,
-    "precision@10": 0.4529411764705882,
-    "recall@10": 1.0,
-    "mrr": 0.796078431372549,
-    "ndcg@10": 0.8196065055025575
+    "precision@5": 0.27368421052631586,
+    "recall@5": 0.18914068387752597,
+    "ndcg@5": 0.3427846900987183,
+    "precision@10": 0.2210526315789474,
+    "recall@10": 0.2929513468987153,
+    "ndcg@10": 0.3401002956154267,
+    "mrr@10": 0.6267543859649123
   }
 }

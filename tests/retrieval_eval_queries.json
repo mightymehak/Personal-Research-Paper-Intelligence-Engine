@@ -3,33 +3,44 @@
     "query_id": "Q01",
     "query": "What are the advantages of decoupling vector indexes in PostgreSQL?",
     "relevant_chunk_ids": [
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
       "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_18"
-    ]
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_18",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "Direct passages explain decoupling benefits, flexibility, pluggable indexes, and custom optimizations."
   },
   {
     "query_id": "Q02",
     "query": "How do vector databases perform similarity search?",
     "relevant_chunk_ids": [
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_24",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_13",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_0",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_1",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_13",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_5"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_24",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_27",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_35"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers explain embeddings, similarity scores, query vectors, and candidate retrieval."
   },
   {
     "query_id": "Q03",
     "query": "How do approximate nearest neighbor indexes work?",
     "relevant_chunk_ids": [
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_28",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_68",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_27",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_71",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_89",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_44",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_38"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_49",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_68",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_73",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_83",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_86"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The survey describes ANN queries and multiple approximate indexing strategies."
   },
   {
     "query_id": "Q04",
@@ -37,160 +48,286 @@
     "relevant_chunk_ids": [
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_27",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_28",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_37",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_29",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_38",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_71",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_24"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_36",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_72"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The survey contrasts brute-force/exact search with approximate search and discusses accuracy."
   },
   {
     "query_id": "Q05",
     "query": "How do graph-based indexes accelerate vector search?",
     "relevant_chunk_ids": [
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_24",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_25",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_68",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_17",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_79",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_44"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_71",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_73",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_75",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_83",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_86"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers describe graph indexes, neighbor links, graph construction, and navigable search."
   },
   {
     "query_id": "Q06",
     "query": "What are the main challenges of maintaining consistency between a database and a decoupled vector index?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_8",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_46",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_7",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_24",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_5",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_19",
       "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_23",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_19"
-    ]
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_24",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_25",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_26",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_35",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_42",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_8"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The PostgreSQL-V paper explicitly discusses index inconsistency and its consistency/recovery mechanism."
   },
   {
     "query_id": "Q07",
     "query": "How can vector search performance be improved in PostgreSQL?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_43",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
       "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_12",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39"
-    ]
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_13",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_18",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_41",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The PostgreSQL-V paper discusses architectural and index-level approaches plus benchmark comparisons."
   },
   {
     "query_id": "Q08",
     "query": "What role do embeddings play in vector database search?",
     "relevant_chunk_ids": [
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_14",
       "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_13",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_14",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_0",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_1",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_25",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_16"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_26"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers describe encoding entities into vectors and how embeddings are used in search."
   },
   {
     "query_id": "Q09",
     "query": "How do vector databases organize and store high-dimensional vectors?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_15",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_17",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_18",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_20",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_21",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_22",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_21",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_44",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_6",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_7"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers describe storage managers, index structures, segments, and vector storage approaches."
   },
   {
     "query_id": "Q10",
     "query": "Which techniques are used to reduce the cost of vector similarity search?",
     "relevant_chunk_ids": [
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_18",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_106",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_107",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_112",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_35",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_107"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_47",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_49",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_55",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_56"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers describe indexing, quantization, hashing, graph search, and hardware/distributed optimizations."
   },
   {
     "query_id": "Q11",
     "query": "How does PostgreSQL support vector indexing and similarity queries?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_15",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9",
       "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_43",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_11",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_20",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_21",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_22",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_36",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
       "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_7",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_38"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_43"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The PostgreSQL-V paper and survey describe PostgreSQL vector extensions, indexes, and query integration."
   },
   {
     "query_id": "Q12",
     "query": "What are the limitations of existing vector database management systems?",
     "relevant_chunk_ids": [
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_46",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_47",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_48",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_12",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_14",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_4",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_10",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_144",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_9",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_1",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_42",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_136",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_141"
-    ]
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_145",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_146",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_147",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_4"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The survey and tutorial list limitations and open problems in vector database systems."
   },
   {
     "query_id": "Q13",
     "query": "How does a vector database select the top-k nearest vectors?",
     "relevant_chunk_ids": [
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_13",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_14",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_24",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_27",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_28",
       "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41"
-    ]
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers define top-k/nearest-neighbor queries and describe candidate search/indexing."
   },
   {
     "query_id": "Q14",
     "query": "What trade-offs exist between vector search speed and retrieval accuracy?",
-    "relevant_chunk_ids": []
+    "relevant_chunk_ids": [
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_18",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_41",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_28",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_36",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_37",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_49"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The survey discusses accuracy and performance metrics, plus index trade-offs affecting speed and recall."
   },
   {
     "query_id": "Q15",
     "query": "What experiments are used to evaluate vector search systems?",
     "relevant_chunk_ids": [
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_7"
-    ]
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_45",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_40",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_41",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_42",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_142",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_143"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers describe benchmark designs and concrete experiments comparing indexes and systems."
   },
   {
     "query_id": "Q16",
     "query": "Which performance metrics can be used to compare vector search systems?",
-    "relevant_chunk_ids": []
+    "relevant_chunk_ids": [
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_40",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_41",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_143",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_36",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_37"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The survey explicitly identifies precision, recall, latency, and throughput as evaluation metrics."
   },
   {
     "query_id": "Q17",
     "query": "How does increasing the dataset size affect vector search performance?",
-    "relevant_chunk_ids": []
+    "relevant_chunk_ids": [],
+    "answerability": "insufficient_evidence",
+    "labeling_note": "The corpus mentions benchmarks spanning dataset sizes and experiments on 10-million-vector datasets, but does not clearly establish how performance changes as dataset size increases."
   },
   {
     "query_id": "Q18",
     "query": "What are the key contributions of the decoupled vector search approach for PostgreSQL?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
       "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_15",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_40"
-    ]
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_18",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_20",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_24",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_25",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_3",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_39",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_41",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_9"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The PostgreSQL-V paper states its system contributions, decoupled architecture, consistency approach, and evaluations."
   },
   {
     "query_id": "Q19",
     "query": "What are the main research directions and unresolved challenges in vector databases?",
     "relevant_chunk_ids": [
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_144"
-    ]
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_46",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_47",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_48",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_44",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_45",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_46",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_47",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_144",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_145",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_146",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_147"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers contain dedicated challenges/open-problems and future-work sections."
   },
   {
     "query_id": "Q20",
     "query": "How do vector database systems differ in their indexing and search approaches?",
     "relevant_chunk_ids": [
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_6",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_15",
-      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_148",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_6",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_5",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_12",
-      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_2",
-      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_37"
-    ]
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_17",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_24",
+      "44e218a3-e4fb-41ba-9fb1-18d462b7a8d8_chunk_25",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_16",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_17",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_21",
+      "532a9220-d252-48f8-bcae-aecc9897ff6d_chunk_22",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_112",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_118",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_13",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_27",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_41",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_44",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_6",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_68",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_7",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_9",
+      "8fe68119-982f-4ffa-a0ca-a2b530c8b864_chunk_90"
+    ],
+    "answerability": "answerable",
+    "labeling_note": "The papers compare indexing families, query processing, storage approaches, and system architectures."
   }
 ]
